@@ -1,0 +1,256 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.2.17",
+    "lastTouchedAt": "2026-02-25T00:00:00.000Z"
+  },
+  "env": {
+    "vars": {
+      "GEMINI_API_KEY": "REPLACE_ME",
+      "GOOGLE_API_KEY": "REPLACE_ME",
+      "OPENAI_API_KEY": "REPLACE_ME"
+    }
+  },
+  "browser": {
+    "enabled": true
+  },
+  "auth": {
+    "profiles": {
+      "anthropic:default": {
+        "provider": "anthropic",
+        "mode": "token"
+      },
+      "google:default": {
+        "provider": "google",
+        "mode": "api_key"
+      },
+      "openai:default": {
+        "provider": "openai",
+        "mode": "api_key"
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "anthropic/claude-sonnet-4-6",
+        "fallbacks": [
+          "anthropic/claude-sonnet-4-6",
+          "openai/gpt-4o",
+          "google/gemini-2.0-flash"
+        ]
+      },
+      "models": {
+        "anthropic/claude-opus-4-6": {
+          "alias": "opus"
+        },
+        "anthropic/claude-sonnet-4-6": {
+          "alias": "sonnet"
+        },
+        "google/gemini-2.0-flash": {
+          "alias": "gemini"
+        },
+        "openai/gpt-4o": {
+          "alias": "gpt"
+        }
+      },
+      "workspace": "REPLACE_ME_WITH_WORKSPACE_PATH",
+      "userTimezone": "America/Chicago",
+      "envelopeTimezone": "America/Chicago",
+      "contextTokens": 1000000,
+      "memorySearch": {
+        "enabled": true,
+        "provider": "gemini",
+        "model": "gemini-embedding-001",
+        "query": {
+          "hybrid": {
+            "enabled": true,
+            "vectorWeight": 0.7,
+            "textWeight": 0.3,
+            "candidateMultiplier": 4
+          }
+        }
+      },
+      "contextPruning": {
+        "mode": "cache-ttl",
+        "ttl": "12h"
+      },
+      "compaction": {
+        "mode": "safeguard",
+        "reserveTokensFloor": 60000,
+        "memoryFlush": {
+          "enabled": true,
+          "softThresholdTokens": 10000
+        }
+      },
+      "thinkingDefault": "low",
+      "typingMode": "instant",
+      "heartbeat": {
+        "every": "4h",
+        "activeHours": {
+          "start": "07:00",
+          "end": "23:00"
+        }
+      },
+      "maxConcurrent": 2,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "model": {
+          "primary": "anthropic/claude-sonnet-4-6"
+        }
+      }
+    ]
+  },
+  "tools": {
+    "exec": {
+      "security": "full"
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "bash": true,
+    "restart": true
+  },
+  "session": {
+    "dmScope": "per-channel-peer",
+    "resetTriggers": [
+      "!clear",
+      "!reset",
+      "!new"
+    ],
+    "reset": {
+      "mode": "daily",
+      "atHour": 4,
+      "idleMinutes": 60
+    },
+    "maintenance": {
+      "mode": "warn",
+      "pruneAfter": "30d",
+      "maxEntries": 500,
+      "rotateBytes": "10mb"
+    }
+  },
+  "cron": {
+    "sessionRetention": "30m"
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "boot-md": {
+          "enabled": true
+        },
+        "command-logger": {
+          "enabled": true
+        },
+        "session-memory": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": false,
+      "dmPolicy": "pairing",
+      "botToken": "REPLACE_ME",
+      "groupPolicy": "allowlist",
+      "streamMode": "partial"
+    },
+    "discord": {
+      "enabled": false,
+      "token": "REPLACE_ME",
+      "groupPolicy": "allowlist",
+      "dmPolicy": "allowlist",
+      "allowFrom": ["REPLACE_ME_WITH_YOUR_DISCORD_USER_ID"],
+      "guilds": {}
+    },
+    "slack": {
+      "mode": "socket",
+      "webhookPath": "/slack/events",
+      "enabled": false,
+      "commands": {
+        "native": true
+      },
+      "botToken": "REPLACE_ME",
+      "appToken": "REPLACE_ME",
+      "userTokenReadOnly": true,
+      "groupPolicy": "allowlist",
+      "replyToMode": "off",
+      "allowFrom": ["REPLACE_ME_WITH_YOUR_SLACK_USER_ID"],
+      "channels": {
+        "#general": {
+          "allow": true,
+          "requireMention": false
+        }
+      }
+    },
+    "whatsapp": {
+      "enabled": false,
+      "dmPolicy": "allowlist",
+      "selfChatMode": false,
+      "allowFrom": ["REPLACE_ME_WITH_YOUR_PHONE"],
+      "groupPolicy": "allowlist",
+      "debounceMs": 1500,
+      "mediaMaxMb": 50
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "REPLACE_ME_WITH_SECURE_TOKEN"
+    },
+    "tailscale": {
+      "mode": "serve",
+      "resetOnExit": false
+    },
+    "reload": {
+      "mode": "hybrid",
+      "debounceMs": 300
+    }
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    },
+    "entries": {
+      "browser-use": { "enabled": true },
+      "firecrawl-search": { "enabled": true },
+      "perplexity": { "enabled": true },
+      "planner": { "enabled": true },
+      "resend": { "enabled": false },
+      "notion": { "enabled": false },
+      "figma": { "enabled": false },
+      "linkedin": { "enabled": false },
+      "gcalcli-calendar": { "enabled": false },
+      "gog": { "enabled": false },
+      "last30days": { "enabled": false },
+      "qmd": { "enabled": false },
+      "seo-dataforseo": { "enabled": false },
+      "self-improvement": { "enabled": false },
+      "deep-research": { "enabled": false },
+      "reddit-cli": { "enabled": false },
+      "helpscout": { "enabled": false },
+      "webflow": { "enabled": false }
+    }
+  },
+  "plugins": {
+    "entries": {
+      "telegram": { "enabled": false },
+      "discord": { "enabled": false },
+      "slack": { "enabled": false },
+      "whatsapp": { "enabled": false }
+    }
+  }
+}
