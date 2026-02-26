@@ -1,0 +1,51 @@
+<!-- VastVision IP Intelligence - Paste into Webflow Site Settings > Custom Code > Footer Code -->
+<!-- Zero dependencies. No API key needed. Works with existing PostHog install. -->
+<script>
+(function() {
+  // Don't run more than once per session
+  if (sessionStorage.getItem('_vv_ip_enriched')) return;
+
+  // ipapi.co: HTTPS, no key, 1000 req/day free
+  // Returns: ip, org, asn, city, country
+  fetch('https://ipapi.co/json/')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data || data.error) return;
+
+      var payload = {
+        ip_org:     data.org      || '',
+        ip_asn:     data.asn      || '',
+        ip_city:    data.city     || '',
+        ip_region:  data.region   || '',
+        ip_country: data.country  || '',
+        ip_addr:    data.ip       || '',
+        page_path:  window.location.pathname,
+        page_url:   window.location.href,
+        referrer:   document.referrer || '',
+      };
+
+      // Send to PostHog if present (VastVision already has it)
+      if (typeof posthog !== 'undefined') {
+        posthog.capture('ip_enriched', payload);
+        // Also tag the person record for cross-session lookup
+        posthog.people && posthog.people.set({
+          company_org: data.org || '',
+          company_asn: data.asn || '',
+        });
+      }
+
+      // Mark done for this session
+      sessionStorage.setItem('_vv_ip_enriched', '1');
+
+      // Optional: fire to your own endpoint instead of / in addition to PostHog
+      // fetch('https://your-endpoint.com/visit', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(payload)
+      // });
+    })
+    .catch(function() {
+      // Fail silently - never break the site
+    });
+})();
+</script>
