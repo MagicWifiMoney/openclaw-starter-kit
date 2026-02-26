@@ -129,35 +129,41 @@ def get_google_maps_serp(
     keyword: str,
     location_name: str = None,
     language_name: str = None,
-    depth: int = 20,
+    location_code: int = None,
+    language_code: str = "en",
+    depth: int = 100,
     save: bool = True
 ) -> Dict[str, Any]:
     """
     Get Google Maps/Local search results for a keyword.
 
+    NOTE: Maps API uses location_code + language_code, not location_name/language_name.
+    City is best embedded in the keyword itself (e.g. "church Minneapolis MN").
+
     Args:
-        keyword: Search query (e.g., "restaurants near me")
-        location_name: Target location
-        language_name: Target language
-        depth: Number of results
+        keyword: Search query including city if needed (e.g., "churches Minneapolis MN")
+        location_name: Ignored for Maps (embed city in keyword instead)
+        language_name: Ignored for Maps (use language_code)
+        location_code: DataForSEO location code (default 2840 = US)
+        language_code: Language code (default "en")
+        depth: Number of results (max 100 per request)
         save: Whether to save results
 
     Returns:
         Dict containing local business listings
 
     Example:
-        >>> result = get_google_maps_serp("coffee shops downtown")
+        >>> result = get_google_maps_serp("coffee shops Minneapolis MN")
     """
     client = get_client()
-    location = location_name or settings.DEFAULT_LOCATION_NAME
-    language = language_name or settings.DEFAULT_LANGUAGE_NAME
+    loc_code = location_code or settings.DEFAULT_LOCATION_CODE
 
     try:
         response = client.serp.google_maps_live_advanced([{
             "keyword": keyword,
-            "location_name": location,
-            "language_name": language,
-            "depth": depth
+            "location_code": loc_code,
+            "language_code": language_code,
+            "depth": min(depth, 100)
         }])
 
         result = response.to_dict() if hasattr(response, 'to_dict') else response

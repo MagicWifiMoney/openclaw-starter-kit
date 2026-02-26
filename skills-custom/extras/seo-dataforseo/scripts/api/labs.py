@@ -464,6 +464,63 @@ def get_domain_keywords(
         raise
 
 
+def get_keywords_for_site(
+    target_domain: str,
+    location_name: str = None,
+    language_name: str = None,
+    limit: int = 100,
+    save: bool = True
+) -> Dict[str, Any]:
+    """
+    Get keyword ideas based on a website's content (Labs version).
+
+    Uses DataForSEO Labs google_keywords_for_site_live to find keywords
+    the site should rank for based on its topic/content.
+
+    Args:
+        target_domain: Domain to analyze (e.g., "competitor.com")
+        location_name: Target location
+        language_name: Target language
+        limit: Maximum results
+        save: Whether to save results
+
+    Returns:
+        Dict containing keyword suggestions for the domain
+
+    Cost: $0.01/task + $0.0001/item
+
+    Example:
+        >>> result = get_keywords_for_site("fifti-fifti.net")
+    """
+    client = get_client()
+    location = location_name or settings.DEFAULT_LOCATION_NAME
+    language = language_name or settings.DEFAULT_LANGUAGE_NAME
+
+    try:
+        response = client.labs.google_keywords_for_site_live([{
+            "target": target_domain,
+            "location_name": location,
+            "language_name": language,
+            "limit": min(limit, 1000)
+        }])
+
+        result = response.to_dict() if hasattr(response, 'to_dict') else response
+
+        if save:
+            save_result(
+                result,
+                category="labs",
+                operation="keywords_for_site",
+                keyword=target_domain
+            )
+
+        return result
+
+    except ApiException as e:
+        print(f"API Exception: {e}")
+        raise
+
+
 def get_competitors(
     keywords: List[str],
     location_name: str = None,

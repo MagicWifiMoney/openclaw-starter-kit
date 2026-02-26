@@ -3,15 +3,16 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables from .env file in current working directory
-load_dotenv()
+# Load from ~/.env first (system-wide credentials), then local .env (project overrides)
+load_dotenv(Path.home() / ".env", override=False)
+load_dotenv(override=False)  # local .env in cwd
 
 
 class Settings:
     """Application settings loaded from environment."""
 
-    # Authentication
-    DATAFORSEO_LOGIN: str = os.getenv("DATAFORSEO_LOGIN", "")
+    # Authentication - support both DATAFORSEO_LOGIN and DATAFORSEO_USERNAME
+    DATAFORSEO_LOGIN: str = os.getenv("DATAFORSEO_LOGIN", "") or os.getenv("DATAFORSEO_USERNAME", "")
     DATAFORSEO_PASSWORD: str = os.getenv("DATAFORSEO_PASSWORD", "")
 
     # Default location/language settings
