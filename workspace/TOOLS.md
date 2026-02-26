@@ -133,8 +133,6 @@ Quick reference for all external tools and services. Update this file as integra
 
   Government Contracting:
   - SAM.gov API (federal opportunities)
-  - USASpending.gov API (past awards)
-  - SBIR.gov (small business innovation)
   - GovWin IQ (opportunity intelligence)
 
   E-commerce:

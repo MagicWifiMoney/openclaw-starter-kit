@@ -29,7 +29,5 @@
 ### Government API Notes
 *(Only relevant if using the gov contracting industry module)*
 - **SAM.gov API** requires date range (max 1 year between postedFrom and postedTo)
-- **USASpending.gov** data lags 1-3 months — don't rely on it for recent awards
-- **SBIR.gov** legacy JSON API is retired — use SAM.gov SBIR filter or web search instead
 - **Grants.gov** API response structure nests data under `data.oppHits`
 - **Schematron** (inference.net) needs `"strict": true` and `"additionalProperties": false` in all JSON schemas

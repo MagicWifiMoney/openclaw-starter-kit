@@ -48,14 +48,7 @@
 │   ├── typefully/             <- Social media posting
 │   ├── resend/                <- Transactional email
 │   ├── seo-dataforseo/        <- Keyword research & SERP analysis
-│   ├── ... and 28 more        <- See full list below
-│   │
-│   ├── sam-gov/               <- [Gov Module] SAM.gov opportunity search
-│   ├── usaspending/           <- [Gov Module] Contract award tracking
-│   ├── sbir-search/           <- [Gov Module] SBIR/STTR solicitation finder
-│   ├── grants-gov/            <- [Gov Module] Federal grant search
-│   ├── gov-intel/             <- [Gov Module] Combined competitive intelligence
-│   └── schematron/            <- [Gov Module] HTML->JSON extraction (web scraping)
+│   └── ... and 28 more        <- See full list below
 │
 └── reference/
     ├── learnings.md           <- Tool gotchas & operational lessons
@@ -101,7 +94,6 @@ These power the fundamental capabilities every agent needs.
 | `agentmail` | AI agent email inboxes |
 | `typefully` | Social media posting (Twitter, LinkedIn, etc.) |
 | `bird` | Twitter/X reading & engagement |
-| `helpscout` | Help Scout customer support |
 
 ---
 
@@ -153,23 +145,6 @@ Specialized tools that extend your agent's reach.
 | Skill | Description |
 |-------|-------------|
 | `polymarket` | Prediction market queries |
-
----
-
-### Optional: Government Contracting Module
-
-These 6 skills are purpose-built for government contracting workflows. Skip these entirely if your business doesn't work with the federal government.
-
-| Skill | What It Does | API Key Needed? |
-|-------|-------------|-----------------|
-| **sam-gov** | Searches SAM.gov for contract opportunities by NAICS, keywords, agency, set-asides. | SAM.gov (free) |
-| **usaspending** | Tracks federal contract awards, spending by agency/contractor, competitor research. | No key needed (free public API) |
-| **sbir-search** | Finds SBIR/STTR solicitations across DOE, DoD, NASA, NSF. | SAM.gov |
-| **grants-gov** | Searches federal grants by keyword, agency, CFDA number. | No key needed (free public API) |
-| **gov-intel** | Combines all 4 government sources into competitive intelligence reports: market sizing, competitor tracking, weekly intel briefs. | Uses above keys |
-| **schematron** | Extracts structured data from any webpage (competitor sites, RFP docs, news). Also useful outside government contexts. | inference.net (~$0.02/1M tokens) |
-
-To install the government module, include the `sam-gov/`, `usaspending/`, `sbir-search/`, `grants-gov/`, `gov-intel/`, and `schematron/` directories when copying skills in Step 4 of the setup guide. Otherwise, simply skip them.
 
 ---
 
@@ -302,7 +277,6 @@ See **[SETUP-GUIDE.md](./SETUP-GUIDE.md)** for the full API key checklist:
 | Required | Anthropic, OpenAI, Gemini, Brave Search |
 | Recommended | Notion, Slack, Resend, GitHub, Perplexity |
 | Optional | Vercel, ElevenLabs, Cloudflare, Apify |
-| Gov Module (Free) | SAM.gov, Grants.gov, USASpending, SBIR |
 
 ---
 

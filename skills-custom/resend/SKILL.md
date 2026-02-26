@@ -1,0 +1,596 @@
+---
+name: resend
+description: Send transactional emails via Resend API. Simple, reliable email delivery for notifications, alerts, reports, and customer communication. Built for developers, optimized for deliverability.
+---
+
+# Resend — Transactional Email Delivery
+
+Send professional transactional emails with exceptional deliverability. Resend is purpose-built for developers who need reliable email infrastructure without the complexity.
+
+## Why Use This
+
+| Service | Setup Time | Deliverability | Developer Experience |
+|---------|-----------|----------------|---------------------|
+| SendGrid/Mailgun | Hours | Good | Complex |
+| AWS SES | Days | Good | Difficult |
+| **Resend** | **Minutes** | **Excellent** | **Simple** |
+
+Resend features:
+- **React Email integration** — build emails with React components
+- **99.9% uptime SLA** — enterprise reliability
+- **Built-in deliverability tools** — DKIM, SPF, DMARC auto-configured
+- **Simple API** — one endpoint, clean REST interface
+- **Generous free tier** — 3,000 emails/month for free, $20/month for 50,000
+
+## Setup
+
+```bash
+# Get your API key
+# 1. Go to https://resend.com and create an account
+# 2. Navigate to API Keys in your dashboard
+# 3. Generate a new key (starts with "re_")
+export RESEND_API_KEY="re_xxxxxxxxxxxxx"
+```
+
+### Domain Verification
+
+Before sending emails from your domain, verify it in Resend:
+
+1. Go to **Domains** in the Resend dashboard
+2. Click **Add Domain** and enter your domain (e.g., `yourbusiness.com`)
+3. Add the provided DNS records to your domain:
+   - **TXT** record for domain verification
+   - **MX** records for receiving bounces
+   - **CNAME** records for DKIM signing
+4. Wait 24-48 hours for DNS propagation (usually faster)
+5. Verify the domain in the dashboard
+
+**Test mode:** You can send emails to your own verified email address without a custom domain. Perfect for testing.
+
+## Quick Example
+
+### Using the Resend Node.js SDK
+
+```javascript
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+async function sendEmail() {
+  const { data, error } = await resend.emails.send({
+    from: 'Agent <agent@yourbusiness.com>',
+    to: ['user@example.com'],
+    subject: 'Daily Briefing - Feb 26, 2026',
+    html: '<h1>Your Daily Briefing</h1><p>Here\'s what happened today...</p>'
+  });
+
+  if (error) {
+    console.error('Failed to send email:', error);
+    return null;
+  }
+
+  console.log('Email sent:', data.id);
+  return data;
+}
+```
+
+### Using the REST API (curl)
+
+```bash
+curl -X POST https://api.resend.com/emails \
+  -H "Authorization: Bearer ${RESEND_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": "Agent <agent@yourbusiness.com>",
+    "to": ["user@example.com"],
+    "subject": "Your Daily Report",
+    "html": "<h1>Daily Report</h1><p>Sales: $12,450</p>"
+  }'
+```
+
+Response:
+```json
+{
+  "id": "49a3999c-0ce1-4ea6-ab68-afcd6dc2e794"
+}
+```
+
+## AI Agent Use Cases
+
+### 1. Daily Briefing Emails
+
+Send automated daily summaries to the user every morning.
+
+```javascript
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+async function sendDailyBriefing(userData) {
+  const { opportunities, tasks, metrics } = userData;
+
+  const html = `
+    <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h1 style="color: #111827;">Daily Briefing - ${new Date().toLocaleDateString()}</h1>
+
+      <h2 style="color: #374151; font-size: 18px;">New Opportunities (${opportunities.length})</h2>
+      <ul style="line-height: 1.8;">
+        ${opportunities.map(opp => `
+          <li><strong>${opp.title}</strong> - ${opp.agency} - Due: ${opp.deadline}</li>
+        `).join('')}
+      </ul>
+
+      <h2 style="color: #374151; font-size: 18px;">Tasks Due Today (${tasks.length})</h2>
+      <ul style="line-height: 1.8;">
+        ${tasks.map(task => `<li>${task.title} - ${task.priority}</li>`).join('')}
+      </ul>
+
+      <h2 style="color: #374151; font-size: 18px;">Key Metrics</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="background: #f3f4f6;">
+          <td style="padding: 12px; border: 1px solid #e5e7eb;">Pipeline Value</td>
+          <td style="padding: 12px; border: 1px solid #e5e7eb; text-align: right;"><strong>$${metrics.pipelineValue.toLocaleString()}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; border: 1px solid #e5e7eb;">Proposals Submitted</td>
+          <td style="padding: 12px; border: 1px solid #e5e7eb; text-align: right;"><strong>${metrics.proposalsSubmitted}</strong></td>
+        </tr>
+        <tr style="background: #f3f4f6;">
+          <td style="padding: 12px; border: 1px solid #e5e7eb;">Win Rate</td>
+          <td style="padding: 12px; border: 1px solid #e5e7eb; text-align: right;"><strong>${metrics.winRate}%</strong></td>
+        </tr>
+      </table>
+
+      <p style="margin-top: 24px; color: #6b7280; font-size: 14px;">
+        Generated by your AI agent at ${new Date().toLocaleTimeString()}
+      </p>
+    </div>
+  `;
+
+  const { data, error } = await resend.emails.send({
+    from: 'Agent <agent@yourbusiness.com>',
+    to: ['you@yourbusiness.com'],
+    subject: `Daily Briefing - ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`,
+    html: html
+  });
+
+  if (error) throw error;
+  return data;
+}
+```
+
+### 2. Critical Alert Notifications
+
+Send immediate notifications when something important happens.
+
+```javascript
+async function sendCriticalAlert(alert) {
+  const { data, error } = await resend.emails.send({
+    from: 'Alerts <alerts@yourbusiness.com>',
+    to: ['you@yourbusiness.com'],
+    subject: `🚨 CRITICAL: ${alert.title}`,
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #fee2e2; border-left: 4px solid #dc2626; padding: 16px; margin-bottom: 24px;">
+          <h1 style="color: #991b1b; margin: 0;">Critical Alert</h1>
+        </div>
+
+        <h2 style="color: #111827;">${alert.title}</h2>
+        <p style="font-size: 16px; line-height: 1.6; color: #374151;">
+          ${alert.description}
+        </p>
+
+        <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin: 24px 0;">
+          <strong style="color: #111827;">Details:</strong>
+          <ul style="margin: 8px 0; padding-left: 24px;">
+            <li><strong>Source:</strong> ${alert.source}</li>
+            <li><strong>Time:</strong> ${new Date(alert.timestamp).toLocaleString()}</li>
+            <li><strong>Severity:</strong> ${alert.severity}</li>
+          </ul>
+        </div>
+
+        <a href="${alert.actionUrl}" style="display: inline-block; background: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600;">
+          View Details
+        </a>
+      </div>
+    `
+  });
+
+  if (error) throw error;
+  return data;
+}
+```
+
+### 3. Client Report Delivery
+
+Send weekly/monthly reports to clients.
+
+```javascript
+async function sendClientReport(client, reportData) {
+  const { data, error } = await resend.emails.send({
+    from: 'Reports <reports@yourbusiness.com>',
+    to: [client.email],
+    cc: ['you@yourbusiness.com'],
+    subject: `${client.name} - Monthly Progress Report`,
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #111827;">Monthly Progress Report</h1>
+        <p style="font-size: 16px; color: #374151;">Hi ${client.contactName},</p>
+        <p style="font-size: 16px; line-height: 1.6; color: #374151;">
+          Here's a summary of the progress we've made this month on your projects.
+        </p>
+
+        <h2 style="color: #374151; font-size: 18px; margin-top: 32px;">Completed Milestones</h2>
+        <ul style="line-height: 1.8;">
+          ${reportData.milestones.map(m => `<li>${m.title} - ${m.completedDate}</li>`).join('')}
+        </ul>
+
+        <h2 style="color: #374151; font-size: 18px; margin-top: 32px;">Next Month's Goals</h2>
+        <ul style="line-height: 1.8;">
+          ${reportData.upcomingGoals.map(g => `<li>${g.title} - Target: ${g.targetDate}</li>`).join('')}
+        </ul>
+
+        <p style="margin-top: 32px; font-size: 16px; color: #374151;">
+          Questions? Reply to this email or schedule a call.
+        </p>
+
+        <p style="margin-top: 24px; color: #374151;">
+          Best regards,<br>
+          Your Team
+        </p>
+      </div>
+    `,
+    attachments: reportData.pdfPath ? [{
+      filename: 'monthly-report.pdf',
+      path: reportData.pdfPath
+    }] : undefined
+  });
+
+  if (error) throw error;
+  return data;
+}
+```
+
+### 4. Digest Emails (Weekly Summary)
+
+Send weekly summaries of activity, wins, and upcoming deadlines.
+
+```javascript
+async function sendWeeklyDigest(weekData) {
+  const { data, error } = await resend.emails.send({
+    from: 'Weekly Digest <digest@yourbusiness.com>',
+    to: ['you@yourbusiness.com'],
+    subject: `Week in Review - Week of ${weekData.weekStart}`,
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #111827;">Week in Review</h1>
+        <p style="color: #6b7280; font-size: 14px;">Week of ${weekData.weekStart}</p>
+
+        <div style="background: #dcfce7; border-left: 4px solid #16a34a; padding: 16px; margin: 24px 0;">
+          <h2 style="color: #166534; margin: 0 0 8px 0; font-size: 18px;">Wins This Week</h2>
+          <ul style="margin: 0; padding-left: 24px;">
+            ${weekData.wins.map(win => `<li>${win}</li>`).join('')}
+          </ul>
+        </div>
+
+        <h2 style="color: #374151; font-size: 18px;">By the Numbers</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+          <tr style="background: #f3f4f6;">
+            <td style="padding: 12px; border: 1px solid #e5e7eb;">New Opportunities</td>
+            <td style="padding: 12px; border: 1px solid #e5e7eb; text-align: right;"><strong>${weekData.stats.newOpportunities}</strong></td>
+          </tr>
+          <tr>
+            <td style="padding: 12px; border: 1px solid #e5e7eb;">Proposals Submitted</td>
+            <td style="padding: 12px; border: 1px solid #e5e7eb; text-align: right;"><strong>${weekData.stats.proposalsSubmitted}</strong></td>
+          </tr>
+          <tr style="background: #f3f4f6;">
+            <td style="padding: 12px; border: 1px solid #e5e7eb;">Meetings Held</td>
+            <td style="padding: 12px; border: 1px solid #e5e7eb; text-align: right;"><strong>${weekData.stats.meetingsHeld}</strong></td>
+          </tr>
+        </table>
+
+        <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
+          <h2 style="color: #92400e; margin: 0 0 8px 0; font-size: 18px;">Coming Up Next Week</h2>
+          <ul style="margin: 0; padding-left: 24px;">
+            ${weekData.upcoming.map(item => `<li>${item}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `
+  });
+
+  if (error) throw error;
+  return data;
+}
+```
+
+### 5. Welcome Emails for New Contacts
+
+Automatically send welcome emails when new contacts are added to your CRM.
+
+```javascript
+async function sendWelcomeEmail(contact) {
+  const { data, error } = await resend.emails.send({
+    from: 'Team <hello@yourbusiness.com>',
+    to: [contact.email],
+    subject: 'Welcome! Here\'s what to expect',
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #111827;">Welcome, ${contact.firstName}!</h1>
+        <p style="font-size: 16px; line-height: 1.6; color: #374151;">
+          Thanks for reaching out. We're excited to work with you.
+        </p>
+
+        <h2 style="color: #374151; font-size: 18px; margin-top: 32px;">What happens next:</h2>
+        <ol style="line-height: 2; font-size: 16px; color: #374151;">
+          <li>We'll review your requirements</li>
+          <li>Schedule a discovery call within 48 hours</li>
+          <li>Send a detailed proposal within 5 business days</li>
+        </ol>
+
+        <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin: 24px 0;">
+          <p style="margin: 0; color: #1e40af;">
+            <strong>Quick question?</strong> Just reply to this email - it goes directly to our team.
+          </p>
+        </div>
+
+        <p style="margin-top: 32px; font-size: 16px; color: #374151;">
+          Best regards,<br>
+          The Team at ${contact.company || 'Your Business'}
+        </p>
+      </div>
+    `
+  });
+
+  if (error) throw error;
+  return data;
+}
+```
+
+## API Reference
+
+### Send Email (POST /emails)
+
+```bash
+curl -X POST https://api.resend.com/emails \
+  -H "Authorization: Bearer ${RESEND_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": "Sender Name <sender@yourdomain.com>",
+    "to": ["recipient@example.com"],
+    "subject": "Your subject line",
+    "html": "<p>HTML content here</p>",
+    "text": "Plain text fallback (optional)",
+    "cc": ["cc@example.com"],
+    "bcc": ["bcc@example.com"],
+    "reply_to": ["reply@yourdomain.com"],
+    "tags": [
+      {"name": "category", "value": "briefing"},
+      {"name": "user_id", "value": "12345"}
+    ],
+    "attachments": [
+      {
+        "filename": "report.pdf",
+        "content": "base64-encoded-content-here"
+      }
+    ]
+  }'
+```
+
+**Required fields:**
+- `from` — Sender email address (must be from verified domain)
+- `to` — Array of recipient email addresses
+- `subject` — Email subject line
+- `html` or `text` — Email content (at least one required)
+
+**Optional fields:**
+- `cc` — Carbon copy recipients
+- `bcc` — Blind carbon copy recipients
+- `reply_to` — Reply-to address
+- `tags` — Array of key-value tags for tracking/filtering
+- `attachments` — Array of file attachments (base64 encoded)
+
+**Response:**
+```json
+{
+  "id": "49a3999c-0ce1-4ea6-ab68-afcd6dc2e794"
+}
+```
+
+### Node.js SDK Usage
+
+```javascript
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Send simple email
+const { data, error } = await resend.emails.send({
+  from: 'Agent <agent@yourdomain.com>',
+  to: ['user@example.com'],
+  subject: 'Hello',
+  html: '<p>Email content</p>'
+});
+
+// Send with attachments
+const { data, error } = await resend.emails.send({
+  from: 'Agent <agent@yourdomain.com>',
+  to: ['user@example.com'],
+  subject: 'Your Report',
+  html: '<p>Please find attached report</p>',
+  attachments: [
+    {
+      filename: 'report.pdf',
+      path: '/path/to/report.pdf'  // or 'content': base64String
+    }
+  ]
+});
+
+// Send with tags for tracking
+const { data, error } = await resend.emails.send({
+  from: 'Agent <agent@yourdomain.com>',
+  to: ['user@example.com'],
+  subject: 'Daily Briefing',
+  html: '<p>Your briefing</p>',
+  tags: [
+    { name: 'category', value: 'briefing' },
+    { name: 'date', value: '2026-02-26' }
+  ]
+});
+```
+
+## Tips and Best Practices
+
+### 1. Rate Limits
+
+- **Free tier:** 100 emails/day, 3,000 emails/month
+- **Pro tier ($20/mo):** 50,000 emails/month
+- **No per-second rate limit** — batch sending is fine, but be reasonable
+
+If you hit a rate limit, the API returns `429 Too Many Requests`. Handle it gracefully:
+
+```javascript
+async function sendEmailWithRetry(emailData, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    const { data, error } = await resend.emails.send(emailData);
+
+    if (!error) return data;
+
+    if (error.statusCode === 429) {
+      // Wait exponentially: 1s, 2s, 4s
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+      continue;
+    }
+
+    throw error;  // Non-rate-limit error, fail immediately
+  }
+
+  throw new Error('Max retries exceeded');
+}
+```
+
+### 2. Domain Verification is Critical
+
+**Never skip domain verification.** Unverified domains get flagged as spam by Gmail/Outlook. Even if emails "send," they'll land in spam folders.
+
+**Test with a verified email first:**
+```javascript
+// Before verifying your domain, test with your own email
+const { data, error } = await resend.emails.send({
+  from: 'onboarding@resend.dev',  // Resend's test domain
+  to: ['your-email@example.com'],
+  subject: 'Test Email',
+  html: '<p>Testing Resend integration</p>'
+});
+```
+
+Once working, verify your domain and switch to `agent@yourdomain.com`.
+
+### 3. Use Tags for Tracking
+
+Tags help you filter and analyze emails in the Resend dashboard:
+
+```javascript
+const { data, error } = await resend.emails.send({
+  from: 'Agent <agent@yourdomain.com>',
+  to: ['user@example.com'],
+  subject: 'Daily Briefing',
+  html: briefingHtml,
+  tags: [
+    { name: 'type', value: 'briefing' },
+    { name: 'agent', value: 'main' },
+    { name: 'cron_job', value: 'daily-briefing' }
+  ]
+});
+```
+
+Later, filter in the dashboard by `type:briefing` to see all briefing emails.
+
+### 4. HTML Email Best Practices
+
+- **Inline styles** — email clients don't support external CSS
+- **Simple layouts** — avoid complex flexbox/grid, use tables for structure
+- **Max width 600px** — mobile-friendly
+- **Test across clients** — Gmail, Outlook, Apple Mail render differently
+- **Plain text fallback** — always include a `text` field for accessibility
+
+```javascript
+const { data, error } = await resend.emails.send({
+  from: 'Agent <agent@yourdomain.com>',
+  to: ['user@example.com'],
+  subject: 'Daily Briefing',
+  html: '<h1 style="color: #111;">Briefing</h1><p>Content here</p>',
+  text: 'Briefing\n\nContent here'  // Plain text fallback
+});
+```
+
+### 5. Avoid Spam Triggers
+
+- **No ALL CAPS subjects** — "URGENT!!!" = spam
+- **No excessive exclamation marks**
+- **No URL shorteners** — use full URLs
+- **No misleading subjects** — subject must match content
+- **Include unsubscribe link** — for marketing emails (not required for transactional, but good practice)
+
+Good subject lines:
+- "Daily Briefing - Feb 26, 2026"
+- "New opportunity matches your criteria"
+- "Your weekly report is ready"
+
+Bad subject lines:
+- "URGENT ALERT!!!"
+- "You won't believe this..."
+- "RE: RE: RE: Important"
+
+### 6. Test Mode for Development
+
+Before going live, test with Resend's test domain:
+
+```javascript
+// Development mode - no domain verification needed
+const fromAddress = process.env.NODE_ENV === 'production'
+  ? 'agent@yourdomain.com'
+  : 'onboarding@resend.dev';
+
+const { data, error } = await resend.emails.send({
+  from: fromAddress,
+  to: ['your-test-email@example.com'],
+  subject: 'Test Email',
+  html: '<p>Testing</p>'
+});
+```
+
+### 7. Monitor Deliverability
+
+Check the Resend dashboard regularly for:
+- **Bounce rate** — hard bounces (invalid emails) vs soft bounces (full inbox)
+- **Spam complaints** — if users mark your emails as spam
+- **Open rates** — (requires tracking pixel, optional)
+
+High bounce/spam rates hurt your sender reputation. Keep lists clean and only email people who expect to hear from you.
+
+### 8. Batch Sending for Digests
+
+If sending to multiple recipients, send individual emails (not one email with 100 recipients in "to" field):
+
+```javascript
+// Good: Individual emails
+for (const user of users) {
+  await resend.emails.send({
+    from: 'Agent <agent@yourdomain.com>',
+    to: [user.email],
+    subject: `${user.name}'s Daily Briefing`,
+    html: generateBriefingHtml(user)
+  });
+}
+
+// Bad: One email with many recipients (looks like spam)
+await resend.emails.send({
+  from: 'Agent <agent@yourdomain.com>',
+  to: users.map(u => u.email),  // 100 recipients
+  subject: 'Daily Briefing',
+  html: genericHtml
+});
+```
+
+Rate limits won't be an issue for reasonable agent use (< 1,000 emails/day).

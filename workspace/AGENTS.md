@@ -84,7 +84,6 @@ OpenClaw supports domain-specific workflow modules that extend these base operat
 
 | Module | Use Case | What It Contains |
 |--------|----------|------------------|
-| `modules/government-contracting.md` | Federal RFPs, SBIR/STTR, SAM.gov | RFP workflow (find → qualify → draft → review → submit), NAICS codes, compliance matrices, proposal directory structure |
 | `modules/saas-sales.md` | B2B SaaS pipeline | Lead qualification framework, demo prep, trial-to-paid conversion tracking, churn analysis |
 | `modules/ecommerce.md` | DTC / e-commerce ops | Product launch checklists, inventory monitoring, ad spend tracking, seasonal planning |
 | `modules/agency.md` | Marketing/dev agency | Client onboarding, project scoping, deliverable tracking, retainer management |

@@ -29,8 +29,6 @@ cp reference/* ~/clawd/reference/
 cp -r skills-custom/* ~/clawd/skills/
 ```
 
-> **Note:** If you don't need the Government Contracting Module, skip the `sam-gov/`, `usaspending/`, `sbir-search/`, `grants-gov/`, `gov-intel/`, and `schematron/` directories.
-
 ## Step 5: Get Your API Keys
 
 Replace every `REPLACE_ME` in `~/.openclaw/openclaw.json` with real keys.
@@ -86,20 +84,7 @@ If you want to get running fast, these 5 keys get 80% of the value:
 4. **Notion** (pipeline tracking)
 5. **Resend** (email summaries)
 
-## Step 5b: Optional -- Government Contracting APIs (Free)
-
-If your business involves federal government contracting, these free registrations unlock the Government Contracting Module skills:
-
-| # | Token | What For | Where to Get | Notes |
-|---|-------|----------|-------------|-------|
-| 1 | **SAM.gov API Key** | Federal contract opportunities + entity lookups | open.gsa.gov/api/get-started | Free, instant. Powers the daily opportunity scan |
-| 2 | **Grants.gov API Key** | Federal grant opportunities | grants.gov/web/grants/applicants/register.html | Free. Supplements SAM for R&D grants |
-| 3 | **USASpending.gov** | See who's winning contracts in your NAICS codes | No key needed -- public API | Used by competitor watch cron |
-| 4 | **SBIR.gov** | Small business innovation research | No key needed -- public | Agent scrapes this automatically |
-
-> Skip this section entirely if you're not in government contracting. None of these are required for the core agent to function.
-
-## Step 5c: MCP Servers (Optional Power-Ups)
+## Step 5b: MCP Servers (Optional Power-Ups)
 
 MCP (Model Context Protocol) servers give your agent direct access to tools without going through APIs. These are local processes that run alongside OpenClaw.
 
@@ -114,7 +99,7 @@ MCP (Model Context Protocol) servers give your agent direct access to tools with
 
 **Start with zero MCPs.** Add Notion + Google Drive later if your agent feels slow on those integrations. The built-in skills handle 90% of needs without MCPs.
 
-## Step 5d: OAuth Setups
+## Step 5c: OAuth Setups
 
 | Service | What For | Setup Steps |
 |---------|----------|-------------|

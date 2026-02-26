@@ -241,7 +241,6 @@
       "self-improvement": { "enabled": false },
       "deep-research": { "enabled": false },
       "reddit-cli": { "enabled": false },
-      "helpscout": { "enabled": false },
       "webflow": { "enabled": false }
     }
   },
